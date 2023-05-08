@@ -1,4 +1,6 @@
+import org.junit.jupiter.api.Assertions.assertTrue
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class PropertyAccessTest {
 
@@ -20,13 +22,13 @@ class PropertyAccessTest {
         val x = a.find("x")
         val y = a.find("y")
 
-        assert(x?.depth == 0)
-        assert(x?.position == 0)
-        assert(x?.type == typeStr)
+        assertEquals(x?.depth,0)
+        assertEquals(x?.position,0)
+        assertEquals(x?.type,typeStr)
 
-        assert(y?.depth == 0)
-        assert(y?.position == 1)
-        assert(y?.type == typeInt)
+        assertEquals(y?.depth,0)
+        assertEquals(y?.position,1)
+        assertEquals(y?.type,typeInt)
     }
 
     /**
@@ -47,13 +49,13 @@ class PropertyAccessTest {
         val x = b.find("x")
         val y = b.find("y")
 
-        assert(x?.depth == 1)
-        assert(x?.position == 0)
-        assert(x?.type == typeStr)
+        assertEquals(x?.depth,1)
+        assertEquals(x?.position,0)
+        assertEquals(x?.type, typeStr)
 
-        assert(y?.depth == 1)
-        assert(y?.position == 1)
-        assert(y?.type == typeInt)
+        assertEquals(y?.depth,1)
+        assertEquals(y?.position,1)
+        assertEquals(y?.type,typeInt)
     }
 
     /**
@@ -80,15 +82,15 @@ class PropertyAccessTest {
 
         val x = aOfC.find("x")
 
-        assert(x?.depth == 0)
-        assert(x?.position == 0)
-        assert(x?.type == c.init())
+        assertEquals(x?.depth,0)
+        assertEquals(x?.position,0)
+        assertEquals(x?.type,c.init())
 
         val y = aOfC.find("x")?.type?.find("y")
 
-        assert(y?.depth == 1)
-        assert(y?.position == 0)
-        assert(y?.type == typeInt)
+        assertEquals(y?.depth,1)
+        assertEquals(y?.position,0)
+        assertEquals(y?.type,typeInt)
     }
 
     /**
@@ -109,9 +111,9 @@ class PropertyAccessTest {
 
         val property = d.with().param("T", typeStr).init().find("x")
 
-        assert(property?.depth == 2)
-        assert(property?.position == 0)
-        assert(property?.type == typeStr)
+        assertEquals(property?.depth,2)
+        assertEquals(property?.position,0)
+        assertEquals(property?.type,typeStr)
     }
 
     /**
@@ -133,15 +135,15 @@ class PropertyAccessTest {
 
         val property = d.with().param("T", typeStr).init().find("x")
 
-        assert(property?.depth == 2)
-        assert(property?.position == 0)
+        assertEquals(property?.depth,2)
+        assertEquals(property?.position,0)
 
         val propertyType = property?.type
-        assert(property?.type is TypeInstance)
+        assertTrue(property?.type is TypeInstance)
 
         if (propertyType is TypeInstance) {
-            assert(propertyType.typeDefinition == typeList)
-            assert(propertyType.parameterBindings.get("T") == typeStr)
+            assertEquals(propertyType.typeDefinition,typeList)
+            assertEquals(propertyType.parameterBindings.getType("T"),typeStr)
         }
     }
 }

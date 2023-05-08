@@ -21,7 +21,7 @@ class TypeDefinition(val name: String) {
     fun property(name: String, type: TypeExpression) = this.apply { this.properties.add(name to type) }
 
     fun with() = TypeInitiator(this)
-    fun init() = with().init()
+    fun init() = with().init()  // TODO: validation
 
     fun getQualifyingName() = "$packageName.$name"
 
@@ -41,16 +41,16 @@ class TypeDefinition(val name: String) {
 
 class TypeInitiator(private val definition: TypeDefinition) {
 
-    private val parameterBindings: MutableMap<String, TypeExpression> = mutableMapOf()
+    private val parameterBindings = ParameterBindings()
 
-    fun param(param: String, to: TypeExpression) = this.apply { parameterBindings[param] = to }
+    fun param(param: String, to: TypeExpression) = this.apply { parameterBindings.add(param,to) }
 
     fun init() = TypeInstance(typeDefinition = definition, parameterBindings = parameterBindings)
 }
 
 data class TypeInstance(
     val typeDefinition: TypeDefinition,
-    val parameterBindings: Map<String, TypeExpression> = mapOf()
+    val parameterBindings: ParameterBindings
 ) : TypeExpression {
 
     override fun find(name: String): PropertyLookupResult? {
@@ -67,9 +67,17 @@ data class TypeInstance(
     }
 
     override fun toString(): String {
-        return typeDefinition.name + if (parameterBindings.isNotEmpty())
-            "<" + parameterBindings.map { (param, type)-> "$param=$type" }.joinToString(",") + ">"
-        else ""
+        return typeDefinition.name + parameterBindings.toString()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return other is TypeInstance && other.toString() == this.toString()
+    }
+
+    override fun hashCode(): Int {
+        var result = typeDefinition.hashCode()
+        result = 31 * result + parameterBindings.hashCode()
+        return result
     }
 }
 
