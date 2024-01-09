@@ -10,7 +10,7 @@ object TypeHierarchy {
         withBindings: ParameterBindings,
     ): Boolean {
         if (_this.typeDefinition == other.typeDefinition) {
-            return _this.parameterBindings.isAssignable(withBindings)
+            return _this.parameterBindings.isAssignableFrom(withBindings)
         }
         return other.typeDefinition.parent?.let { parent ->
             isAssignableFromInternal(_this, parent, parent.parameterBindings.reMap(withBindings))

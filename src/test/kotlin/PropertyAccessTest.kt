@@ -22,13 +22,13 @@ class PropertyAccessTest {
         val x = a.find("x")
         val y = a.find("y")
 
-        assertEquals(x?.depth,0)
-        assertEquals(x?.position,0)
-        assertEquals(x?.type,typeStr)
+        assertEquals(x?.depth, 0)
+        assertEquals(x?.position, 0)
+        assertEquals(x?.type, typeStr)
 
-        assertEquals(y?.depth,0)
-        assertEquals(y?.position,1)
-        assertEquals(y?.type,typeInt)
+        assertEquals(y?.depth, 0)
+        assertEquals(y?.position, 1)
+        assertEquals(y?.type, typeInt)
     }
 
     /**
@@ -49,13 +49,13 @@ class PropertyAccessTest {
         val x = b.find("x")
         val y = b.find("y")
 
-        assertEquals(x?.depth,1)
-        assertEquals(x?.position,0)
+        assertEquals(x?.depth, 1)
+        assertEquals(x?.position, 0)
         assertEquals(x?.type, typeStr)
 
-        assertEquals(y?.depth,1)
-        assertEquals(y?.position,1)
-        assertEquals(y?.type,typeInt)
+        assertEquals(y?.depth, 1)
+        assertEquals(y?.position, 1)
+        assertEquals(y?.type, typeInt)
     }
 
     /**
@@ -82,15 +82,15 @@ class PropertyAccessTest {
 
         val x = aOfC.find("x")
 
-        assertEquals(x?.depth,0)
-        assertEquals(x?.position,0)
-        assertEquals(x?.type,c.init())
+        assertEquals(x?.depth, 0)
+        assertEquals(x?.position, 0)
+        assertEquals(x?.type, c.init())
 
         val y = aOfC.find("x")?.type?.find("y")
 
-        assertEquals(y?.depth,1)
-        assertEquals(y?.position,0)
-        assertEquals(y?.type,typeInt)
+        assertEquals(y?.depth, 1)
+        assertEquals(y?.position, 0)
+        assertEquals(y?.type, typeInt)
     }
 
     /**
@@ -111,9 +111,9 @@ class PropertyAccessTest {
 
         val property = d.with().param("T", typeStr).init().find("x")
 
-        assertEquals(property?.depth,2)
-        assertEquals(property?.position,0)
-        assertEquals(property?.type,typeStr)
+        assertEquals(property?.depth, 2)
+        assertEquals(property?.position, 0)
+        assertEquals(property?.type, typeStr)
     }
 
     /**
@@ -135,15 +135,73 @@ class PropertyAccessTest {
 
         val property = d.with().param("T", typeStr).init().find("x")
 
-        assertEquals(property?.depth,2)
-        assertEquals(property?.position,0)
+        assertEquals(property?.depth, 2)
+        assertEquals(property?.position, 0)
 
         val propertyType = property?.type
         assertTrue(property?.type is TypeInstance)
 
         if (propertyType is TypeInstance) {
-            assertEquals(propertyType.typeDefinition,typeList)
-            assertEquals(propertyType.parameterBindings.getType("T"),typeStr)
+            assertEquals(propertyType.typeDefinition, typeList)
+            assertEquals(propertyType.parameterBindings.getType("T"), typeStr)
+        }
+    }
+
+    /**
+     * class B<T,K> {
+     *      x: List<K>
+     * }
+     * class C<T>: B<T, Int>
+     *
+     * C<String>.x is List<Int>
+     */
+    @Test
+    fun `parametric property access in chain 3`() {
+        val listOfK = typeList.with().param("K", TypeVariable("K")).init()
+
+        val b = TypeDefinition("B").parameter("T").parameter("K").property("x", listOfK)
+        val c = TypeDefinition("C").extends(b.with().param("T", TypeVariable("T")).param("K", typeInt).init())
+
+        val property = c.with().param("T", typeStr).init().find("x")
+
+        assertEquals(property?.depth, 1)
+        assertEquals(property?.position, 0)
+
+        val propertyType = property?.type
+        assertTrue(property?.type is TypeInstance)
+
+        if (propertyType is TypeInstance) {
+            assertEquals(propertyType.typeDefinition, typeList)
+            assertEquals(propertyType.parameterBindings.getType("K"), typeInt)
+        }
+    }
+
+    /**
+     * class B<T,K> {
+     *      x: List<K>
+     * }
+     * class C<P, G>: B<P, G>
+     *
+     * C<String,Int>.x is List<Int>
+     */
+    @Test
+    fun `parametric property access in chain 4`() {
+        val listOfK = typeList.with().param("K", TypeVariable("K")).init()
+
+        val b = TypeDefinition("B").parameter("T").parameter("K").property("x", listOfK)
+        val c = TypeDefinition("C").extends(b.with().param("T", TypeVariable("P")).param("K", TypeVariable("G")).init())
+
+        val property = c.with().param("P", typeStr).param("G", typeInt).init().find("x")
+
+        assertEquals(property?.depth, 1)
+        assertEquals(property?.position, 0)
+
+        val propertyType = property?.type
+        assertTrue(property?.type is TypeInstance)
+
+        if (propertyType is TypeInstance) {
+            assertEquals(propertyType.typeDefinition, typeList)
+            assertEquals(propertyType.parameterBindings.getType("K"), typeInt)
         }
     }
 }

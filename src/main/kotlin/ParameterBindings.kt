@@ -10,21 +10,27 @@ class ParameterBindings(
         }
     }
 
-    fun isAssignable(
-        with: ParameterBindings
-    ) = bindings.all { (param, variable) -> with.bindings[param]?.isAssignableFrom(variable) ?: false }
+    fun isAssignableFrom(
+        other: ParameterBindings
+    ) = bindings.all { (param, variable) -> other.bindings[param]?.isAssignableFrom(variable) ?: false }
 
-    fun reMap(with: ParameterBindings) = if (with.bindings.isNotEmpty())
-        ParameterBindings(bindings.mapValues { (parameterName, _) -> getType(parameterName, with.bindings) }
-            .toMutableMap())
-    else this
+    fun reMap(with: ParameterBindings): ParameterBindings {
+            val newBindings = mutableMapOf<String, TypeExpression>()
+            bindings.forEach { (name, type) ->
+                if (type is TypeVariable) {
+                    newBindings[name] = getType(type.name, with.bindings)
+                }
+                else newBindings[name] = type;
+            }
+            return ParameterBindings(newBindings)
+    }
 
     fun getType(parameterName: String): TypeExpression {
         return getType(parameterName, bindings)
     }
 
     private fun getType(parameterName: String, bindings: Map<String, TypeExpression>) =
-        bindings[parameterName] ?: throw RuntimeException("unbound parameter: $parameterName")
+        bindings[parameterName] ?: throw RuntimeException("unbound parameter: $parameterName, bindings: $bindings")
 
     override fun toString(): String {
         return if (bindings.isNotEmpty())
