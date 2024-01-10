@@ -7,14 +7,14 @@ interface TypeExpression {
 
 class TypeDefinition(val name: String) {
 
-    var parent: TypeInstance? = null
+    var parent: ConstructedType? = null
         private set
-    val parameters: MutableList<TypeVariable> = mutableListOf()
+    private val parameters: MutableList<TypeVariable> = mutableListOf()
     val properties: MutableList<Pair<String, TypeExpression>> = mutableListOf()
     var packageName: String = "default"
         private set
 
-    fun extends(parent: TypeInstance) = this.apply { this.parent = parent }
+    fun extends(parent: ConstructedType) = this.apply { this.parent = parent }
     fun parameter(name: String, upperBound: TypeExpression? = null) =
         this.apply { this.parameters.add(TypeVariable(name, upperBound)) }
 
@@ -45,10 +45,10 @@ class TypeInitiator(private val definition: TypeDefinition) {
 
     fun param(param: String, to: TypeExpression) = this.apply { parameterBindings.add(param,to) }
 
-    fun init() = TypeInstance(typeDefinition = definition, parameterBindings = parameterBindings)
+    fun init() = ConstructedType(typeDefinition = definition, parameterBindings = parameterBindings)
 }
 
-data class TypeInstance(
+data class ConstructedType(
     val typeDefinition: TypeDefinition,
     val parameterBindings: ParameterBindings
 ) : TypeExpression {
@@ -58,7 +58,7 @@ data class TypeInstance(
     }
 
     override fun isAssignableFrom(other: TypeExpression): Boolean {
-        if (other is TypeInstance) {
+        if (other is ConstructedType) {
             return TypeHierarchy.isAssignableFrom(self = this, other = other)
         } else if (other is TypeVariable) {
             return other.upperBound?.let { isAssignableFrom(it) } ?: false
@@ -71,7 +71,7 @@ data class TypeInstance(
     }
 
     override fun equals(other: Any?): Boolean {
-        return other is TypeInstance && other.toString() == this.toString()
+        return other is ConstructedType && other.toString() == this.toString()
     }
 
     override fun hashCode(): Int {
@@ -96,5 +96,26 @@ class TypeVariable(
 
     override fun toString(): String {
         return "$name extends ${upperBound ?: "Any"}"
+    }
+}
+
+class FunctionType(
+    val name: String,
+    private val parameters: List<Pair<String, TypeExpression>>,
+    val returnType: TypeExpression
+): TypeExpression {
+    override fun find(name: String): PropertyLookupResult? {
+        return null
+    }
+
+    override fun isAssignableFrom(other: TypeExpression): Boolean {
+        if (other is FunctionType) {
+            if (other.parameters.size != parameters.size) return false
+            if (!returnType.isAssignableFrom(other.returnType)) return false
+            return parameters.zip(other.parameters).all { (p1,p2)->
+                p1.second.isAssignableFrom(p2.second)
+            }
+        }
+        return false
     }
 }

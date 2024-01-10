@@ -1,12 +1,12 @@
 object TypeHierarchy {
     fun isAssignableFrom(
-        self: TypeInstance,
-        other: TypeInstance
+        self: ConstructedType,
+        other: ConstructedType
     ) = isAssignableFromInternal(self, other, other.parameterBindings)
 
     private fun isAssignableFromInternal(
-        _this: TypeInstance,
-        other: TypeInstance,
+        _this: ConstructedType,
+        other: ConstructedType,
         withBindings: ParameterBindings,
     ): Boolean {
         if (_this.typeDefinition == other.typeDefinition) {

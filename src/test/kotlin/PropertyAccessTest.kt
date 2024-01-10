@@ -139,9 +139,9 @@ class PropertyAccessTest {
         assertEquals(property?.position, 0)
 
         val propertyType = property?.type
-        assertTrue(property?.type is TypeInstance)
+        assertTrue(property?.type is ConstructedType)
 
-        if (propertyType is TypeInstance) {
+        if (propertyType is ConstructedType) {
             assertEquals(propertyType.typeDefinition, typeList)
             assertEquals(propertyType.parameterBindings.getType("T"), typeStr)
         }
@@ -168,9 +168,9 @@ class PropertyAccessTest {
         assertEquals(property?.position, 0)
 
         val propertyType = property?.type
-        assertTrue(property?.type is TypeInstance)
+        assertTrue(property?.type is ConstructedType)
 
-        if (propertyType is TypeInstance) {
+        if (propertyType is ConstructedType) {
             assertEquals(propertyType.typeDefinition, typeList)
             assertEquals(propertyType.parameterBindings.getType("K"), typeInt)
         }
@@ -197,9 +197,9 @@ class PropertyAccessTest {
         assertEquals(property?.position, 0)
 
         val propertyType = property?.type
-        assertTrue(property?.type is TypeInstance)
+        assertTrue(property?.type is ConstructedType)
 
-        if (propertyType is TypeInstance) {
+        if (propertyType is ConstructedType) {
             assertEquals(propertyType.typeDefinition, typeList)
             assertEquals(propertyType.parameterBindings.getType("K"), typeInt)
         }

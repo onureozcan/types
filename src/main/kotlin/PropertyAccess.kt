@@ -1,7 +1,7 @@
 object PropertyAccess {
     fun find(
         name: String,
-        on: TypeInstance,
+        on: ConstructedType,
         withBindings: ParameterBindings,
         atDepth: Int = 0
     ): PropertyLookupResult? {
@@ -16,7 +16,7 @@ object PropertyAccess {
     private fun resolve(type: TypeExpression, bindings: ParameterBindings): TypeExpression {
         if (type is TypeVariable) {
             return bindings.getType(type.name)
-        } else if (type is TypeInstance) {
+        } else if (type is ConstructedType) {
             return type.copy(parameterBindings = type.parameterBindings.reMap(with = bindings))
         }
         return type
