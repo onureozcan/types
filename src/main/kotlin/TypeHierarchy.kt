@@ -12,8 +12,17 @@ object TypeHierarchy {
         if (_this.typeDefinition == other.typeDefinition) {
             return _this.parameterBindings.isAssignableFrom(withBindings)
         }
-        return other.typeDefinition.parent?.let { parent ->
+        val allParents = mutableListOf<ConstructedType>()
+        other.typeDefinition.parent?.let { allParents.add(it) }
+
+        if (_this.typeDefinition.isInterface) {
+            allParents.addAll(other.typeDefinition.interfaces)
+        }
+        if (allParents.isEmpty()) {
+            return false
+        }
+        return allParents.any { parent ->
             isAssignableFromInternal(_this, parent, parent.parameterBindings.reMap(withBindings))
-        } ?: false
+        }
     }
 }

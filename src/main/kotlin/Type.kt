@@ -5,18 +5,36 @@ interface TypeExpression {
     fun isAssignableFrom(other: TypeExpression): Boolean
 }
 
-class TypeDefinition(val name: String) {
+class TypeDefinition(val name: String, val isInterface: Boolean = false) {
 
     var parent: ConstructedType? = null
         private set
-    private val parameters: MutableList<TypeVariable> = mutableListOf()
+    var interfaces: MutableList<ConstructedType> = mutableListOf()
+        private set
+    val parameters: MutableList<TypeVariable> = mutableListOf()
     val properties: MutableList<Pair<String, TypeExpression>> = mutableListOf()
     var packageName: String = "default"
         private set
 
-    fun extends(parent: ConstructedType) = this.apply { this.parent = parent }
+    fun extends(parent: ConstructedType) = this.apply {
+        if (this.isInterface != parent.typeDefinition.isInterface) {
+            throw RuntimeException("cannot extend from $parent")
+        }
+        this.parent = parent
+    }
+    fun implements(_interface: ConstructedType) = this.apply {
+        if (!_interface.typeDefinition.isInterface) {
+            throw RuntimeException("only interfaces can be implemented")
+        }
+        if (interfaces.any { i -> i.typeDefinition == _interface.typeDefinition}) {
+            throw RuntimeException("already implemented")
+        }
+        this.interfaces.add(_interface)
+    }
     fun parameter(name: String, upperBound: TypeExpression? = null) =
         this.apply { this.parameters.add(TypeVariable(name, upperBound)) }
+
+    fun find(name: String) = properties.find { it.first == name }?.second
 
     fun property(name: String, type: TypeExpression) = this.apply { this.properties.add(name to type) }
 
@@ -45,7 +63,13 @@ class TypeInitiator(private val definition: TypeDefinition) {
 
     fun param(param: String, to: TypeExpression) = this.apply { parameterBindings.add(param,to) }
 
-    fun init() = ConstructedType(typeDefinition = definition, parameterBindings = parameterBindings)
+    fun init(): ConstructedType {
+        definition.parameters.all { typeParam ->
+            val binding = parameterBindings.bindings[typeParam.name] ?: throw RuntimeException("unbound: $typeParam")
+            return@all typeParam.upperBound?.isAssignableFrom(binding) ?: true
+        }
+        return ConstructedType(typeDefinition = definition, parameterBindings = parameterBindings)
+    }
 }
 
 data class ConstructedType(
@@ -91,7 +115,7 @@ class TypeVariable(
     }
 
     override fun isAssignableFrom(other: TypeExpression): Boolean {
-        return upperBound?.isAssignableFrom(other) ?: true
+        return other is TypeVariable && other.name == name
     }
 
     override fun toString(): String {

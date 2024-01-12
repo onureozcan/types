@@ -1,5 +1,5 @@
 class ParameterBindings(
-    private val bindings: MutableMap<String, TypeExpression> = mutableMapOf()
+    val bindings: MutableMap<String, TypeExpression> = mutableMapOf()
 ) {
 
     fun add(param: String, type: TypeExpression) {
@@ -20,7 +20,7 @@ class ParameterBindings(
                 if (type is TypeVariable) {
                     newBindings[name] = getType(type.name, with.bindings)
                 }
-                else newBindings[name] = type;
+                else newBindings[name] = type
             }
             return ParameterBindings(newBindings)
     }

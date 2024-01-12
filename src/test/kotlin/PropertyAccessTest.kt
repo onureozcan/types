@@ -157,7 +157,7 @@ class PropertyAccessTest {
      */
     @Test
     fun `parametric property access in chain 3`() {
-        val listOfK = typeList.with().param("K", TypeVariable("K")).init()
+        val listOfK = typeList.with().param("T", TypeVariable("K")).init()
 
         val b = TypeDefinition("B").parameter("T").parameter("K").property("x", listOfK)
         val c = TypeDefinition("C").extends(b.with().param("T", TypeVariable("T")).param("K", typeInt).init())
@@ -172,7 +172,7 @@ class PropertyAccessTest {
 
         if (propertyType is ConstructedType) {
             assertEquals(propertyType.typeDefinition, typeList)
-            assertEquals(propertyType.parameterBindings.getType("K"), typeInt)
+            assertEquals(propertyType.parameterBindings.getType("T"), typeInt)
         }
     }
 
@@ -186,7 +186,7 @@ class PropertyAccessTest {
      */
     @Test
     fun `parametric property access in chain 4`() {
-        val listOfK = typeList.with().param("K", TypeVariable("K")).init()
+        val listOfK = typeList.with().param("T", TypeVariable("K")).init()
 
         val b = TypeDefinition("B").parameter("T").parameter("K").property("x", listOfK)
         val c = TypeDefinition("C").extends(b.with().param("T", TypeVariable("P")).param("K", TypeVariable("G")).init())
@@ -201,7 +201,7 @@ class PropertyAccessTest {
 
         if (propertyType is ConstructedType) {
             assertEquals(propertyType.typeDefinition, typeList)
-            assertEquals(propertyType.parameterBindings.getType("K"), typeInt)
+            assertEquals(propertyType.parameterBindings.getType("T"), typeInt)
         }
     }
 }

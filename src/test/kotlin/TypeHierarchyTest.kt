@@ -44,7 +44,8 @@ class TypeHierarchyTest {
     @Test
     fun `generic subtypes can be assigned to supertypes`() {
         val typeA = TypeDefinition("A").init()
-        val typeB = TypeDefinition("B").extends(typeA).parameter("T") //, parameters = listOf(TypeVariableV2("T")), extends = setOf(typeA))
+        val typeB = TypeDefinition("B").extends(typeA)
+            .parameter("T") //, parameters = listOf(TypeVariableV2("T")), extends = setOf(typeA))
 
         val typeBofString = typeB.with().param("T", typeString.init()).init()
 
@@ -117,5 +118,87 @@ class TypeHierarchyTest {
         assertFalse(typeAofAny.isAssignableFrom(typeBofString))
         assertFalse(typeBofString.isAssignableFrom(typeAofString))
         assertFalse(typeAofInt.isAssignableFrom(typeBofString))
+    }
+
+
+      /**  class A<T:Number>(
+            var a:T,
+            var b:T
+            ) {
+            fun test() {
+                a = b // OK
+                //a = 3
+            }
+        }
+    */
+    @Test
+    fun `Type variables are invariant`() {
+        val typeA = TypeDefinition("A").parameter("T", typeNumber.init()).property("a", TypeVariable("T")).property("b", TypeVariable("T"))
+        val a = typeA.find("a")!!
+        val b = typeA.find("b")!!
+        assertTrue(a.isAssignableFrom(b))
+        assertFalse(a.isAssignableFrom(typeInt.init()))
+    }
+
+    @Test
+    fun `same interfaces are assignable`() {
+        val interfaceA = TypeDefinition("A", isInterface = true).init()
+        assertTrue(interfaceA.isAssignableFrom(interfaceA))
+    }
+
+    /**
+     * interface A
+     *
+     * class B implements A
+     * class C implements A
+     *
+     * val b = B()
+     * val c = C()
+     *
+     * b = c // Error!
+     */
+    @Test
+    fun `types implementing the same interfaces are NOT assignable IF concrete types are not assignable`() {
+        val interfaceA = TypeDefinition("A", isInterface = true).init()
+        val typeB = TypeDefinition("B").implements(interfaceA).init()
+        val typeC = TypeDefinition("C").implements(interfaceA).init()
+
+        assertFalse(typeB.isAssignableFrom(typeC))
+    }
+
+    /**
+     * interface A
+     *
+     * class B implements A
+     *
+     * val a:A = B() // OK
+     */
+    @Test
+    fun `type implementing an _interface should be assignable to the _interface`() {
+        val interfaceA = TypeDefinition("A", isInterface = true).init()
+        val typeB = TypeDefinition("B").implements(interfaceA).init()
+
+        assertTrue(interfaceA.isAssignableFrom(typeB))
+    }
+
+    /**
+     * interface A
+     *
+     * class B implements A
+     * class C extends B
+     *
+     * val b = B()
+     * val c = C()
+     *
+     * val test:A = c // OK!
+     *
+     */
+    @Test
+    fun `subtype of a type implementing an _interface should be assignable to the _interface`() {
+        val interfaceA = TypeDefinition("A", isInterface = true).init()
+        val typeB = TypeDefinition("B").implements(interfaceA).init()
+        val typeC = TypeDefinition("C").extends(typeB).init()
+
+        assertTrue(interfaceA.isAssignableFrom(typeC))
     }
 }
