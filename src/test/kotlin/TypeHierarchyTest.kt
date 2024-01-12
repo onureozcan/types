@@ -76,13 +76,13 @@ class TypeHierarchyTest {
     /**
     fun test() {
     class A<T>
-    val a: A<String> = A<String>()
+    val a: A<String> = A<String>() // OK
     val a2: A<Any> = A<String>() // Error
-    val a3: A<Int> = A<String>() // Error
+    val a2: A<Int> = A<String>() // Error
     }
      */
     @Test
-    fun `construction of a generic type with substitutable types are assignable`() {
+    fun `construction of a generic type is invariant`() {
         val typeA = TypeDefinition("A").parameter("T")
 
         val typeAofString = typeA.with().param("T", typeString.init()).init()
@@ -93,6 +93,7 @@ class TypeHierarchyTest {
         assertFalse(typeAofAny.isAssignableFrom(typeAofString))
         assertFalse(typeAofInt.isAssignableFrom(typeAofString))
     }
+
 
     /**
     fun test() {
@@ -121,19 +122,20 @@ class TypeHierarchyTest {
     }
 
 
-      /**  class A<T:Number>(
-            var a:T,
-            var b:T
-            ) {
-            fun test() {
-                a = b // OK
-                //a = 3
-            }
-        }
-    */
+    /**  class A<T:Number>(
+    var a:T,
+    var b:T
+    ) {
+    fun test() {
+    a = b // OK
+    //a = 3
+    }
+    }
+     */
     @Test
     fun `Type variables are invariant`() {
-        val typeA = TypeDefinition("A").parameter("T", typeNumber.init()).property("a", TypeVariable("T")).property("b", TypeVariable("T"))
+        val typeA = TypeDefinition("A").parameter("T", typeNumber.init()).property("a", TypeVariable("T"))
+            .property("b", TypeVariable("T"))
         val a = typeA.find("a")!!
         val b = typeA.find("b")!!
         assertTrue(a.isAssignableFrom(b))

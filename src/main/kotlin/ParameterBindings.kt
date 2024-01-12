@@ -12,7 +12,12 @@ class ParameterBindings(
 
     fun isAssignableFrom(
         other: ParameterBindings
-    ) = bindings.all { (param, variable) -> other.bindings[param]?.isAssignableFrom(variable) ?: false }
+    ):Boolean {
+        if (bindings.size != other.bindings.size) return false
+        return bindings.all { (param, binding) ->
+            return@all other.bindings[param]?.let { binding == it } ?: false
+        }
+    }
 
     fun reMap(with: ParameterBindings): ParameterBindings {
             val newBindings = mutableMapOf<String, TypeExpression>()
