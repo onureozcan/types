@@ -4,11 +4,11 @@ import org.junit.jupiter.api.Test
 
 class FunctionTypeTest {
 
-    private val superType = TypeDefinition("SuperT").init()
-    private val subType = TypeDefinition("SubT").extends(superType).init()
-    private val t1 = TypeDefinition("T1").init()
-    private val t2 = TypeDefinition("T2").init()
-    private val t3 = TypeDefinition("nothing").init()
+    private val superType = TypeDefinition("SuperT").construct()
+    private val subType = TypeDefinition("SubT").extends(superType).construct()
+    private val t1 = TypeDefinition("T1").construct()
+    private val t2 = TypeDefinition("T2").construct()
+    private val t3 = TypeDefinition("nothing").construct()
 
     @Test
     fun `functions can NOT be assigned to other types`() {

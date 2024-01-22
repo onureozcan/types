@@ -4,8 +4,8 @@ import kotlin.test.assertEquals
 
 class PropertyAccessTest {
 
-    private val typeStr = TypeDefinition("String").init()
-    private val typeInt = TypeDefinition("Integer").init()
+    private val typeStr = TypeDefinition("String").construct()
+    private val typeInt = TypeDefinition("Integer").construct()
     private val typeList = TypeDefinition("List").parameter("T")
 
     /**
@@ -18,7 +18,7 @@ class PropertyAccessTest {
      */
     @Test
     fun `simple non-parametric property access`() {
-        val a = TypeDefinition("A").property("x", typeStr).property("y", typeInt).init()
+        val a = TypeDefinition("A").property("x", typeStr).property("y", typeInt).construct()
         val x = a.find("x")
         val y = a.find("y")
 
@@ -44,7 +44,7 @@ class PropertyAccessTest {
     @Test
     fun `simple non-parametric property access in chain`() {
         val a = TypeDefinition("A").property("x", typeStr).property("y", typeInt)
-        val b = TypeDefinition("B").extends(a.init()).init()
+        val b = TypeDefinition("B").extends(a.construct()).construct()
 
         val x = b.find("x")
         val y = b.find("y")
@@ -74,17 +74,17 @@ class PropertyAccessTest {
     @Test
     fun `property access on type parameter relies on upper bound`() {
         val b = TypeDefinition("B").property("y", typeInt)
-        val c = TypeDefinition("C").extends(b.init())
+        val c = TypeDefinition("C").extends(b.construct())
 
-        val a = TypeDefinition("A").parameter("T", b.init()).property("x", TypeVariable("T"))
+        val a = TypeDefinition("A").parameter("T", b.construct()).property("x", TypeVariable("T"))
 
-        val aOfC = a.with().param("T", c.init()).init()
+        val aOfC = a.with().param("T", c.construct()).init()
 
         val x = aOfC.find("x")
 
         assertEquals(x?.depth, 0)
         assertEquals(x?.position, 0)
-        assertEquals(x?.type, c.init())
+        assertEquals(x?.type, c.construct())
 
         val y = aOfC.find("x")?.type?.find("y")
 

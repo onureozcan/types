@@ -41,7 +41,7 @@ class TypeDefinition(val name: String, val isInterface: Boolean = false) {
     fun property(name: String, type: TypeExpression) = this.apply { this.properties.add(name to type) }
 
     fun with() = TypeInitiator(this)
-    fun init() = with().init().also {
+    fun construct() = with().init().also {
         validateInterfaces()
     }
 
