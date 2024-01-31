@@ -46,7 +46,7 @@ class TypeHierarchyTest {
         val typeA = TypeDefinition("A").construct()
         val typeB = TypeDefinition("B").extends(typeA).parameter("T")
 
-        val typeBofString = typeB.with().param("T", typeString.construct()).init()
+        val typeBofString = typeB.with().param("T", typeString.construct()).construct()
 
         assertTrue(typeA.isAssignableFrom(typeBofString))
         assertFalse(typeBofString.isAssignableFrom(typeA))
@@ -64,10 +64,10 @@ class TypeHierarchyTest {
     @Test
     fun `subtype of generic supertype can be assigned to generic supertype`() {
         val typeA = TypeDefinition("A").parameter("T")
-        val typeB = TypeDefinition("B").extends(typeA.with().param("T", typeString.construct()).init()).construct()
-        val typeC = TypeDefinition("C").extends(typeA.with().param("T", typeInt.construct()).init()).construct()
+        val typeB = TypeDefinition("B").extends(typeA.with().param("T", typeString.construct()).construct()).construct()
+        val typeC = TypeDefinition("C").extends(typeA.with().param("T", typeInt.construct()).construct()).construct()
 
-        val typeAofString = typeA.with().param("T", typeString.construct()).init()
+        val typeAofString = typeA.with().param("T", typeString.construct()).construct()
 
         assertTrue(typeAofString.isAssignableFrom(typeB))
         assertFalse(typeAofString.isAssignableFrom(typeC))
@@ -86,9 +86,9 @@ class TypeHierarchyTest {
     fun `construction of a generic type is invariant`() {
         val typeA = TypeDefinition("A").parameter("T")
 
-        val typeAofString = typeA.with().param("T", typeString.construct()).init()
-        val typeAofAny = typeA.with().param("T", typeAny).init()
-        val typeAofInt = typeA.with().param("T", typeInt.construct()).init()
+        val typeAofString = typeA.with().param("T", typeString.construct()).construct()
+        val typeAofAny = typeA.with().param("T", typeAny).construct()
+        val typeAofInt = typeA.with().param("T", typeInt.construct()).construct()
 
         assertTrue(typeAofString.isAssignableFrom(typeAofString))
         assertFalse(typeAofAny.isAssignableFrom(typeAofString))
@@ -109,12 +109,12 @@ class TypeHierarchyTest {
     @Test
     fun `generic subtype of generic supertype can be assigned to generic supertype `() {
         val typeA = TypeDefinition("A").parameter("T")
-        val typeB = TypeDefinition("B").parameter("T").extends(typeA.with().param("T", TypeVariable("T")).init())
+        val typeB = TypeDefinition("B").parameter("T").extends(typeA.with().param("T", TypeVariable("T")).construct())
 
-        val typeAofString = typeA.with().param("T", typeString.construct()).init()
-        val typeBofString = typeB.with().param("T", typeString.construct()).init()
-        val typeAofInt = typeA.with().param("T", typeInt.construct()).init()
-        val typeAofAny = typeA.with().param("T", typeAny).init()
+        val typeAofString = typeA.with().param("T", typeString.construct()).construct()
+        val typeBofString = typeB.with().param("T", typeString.construct()).construct()
+        val typeAofInt = typeA.with().param("T", typeInt.construct()).construct()
+        val typeAofAny = typeA.with().param("T", typeAny).construct()
 
         assertTrue(typeAofString.isAssignableFrom(typeBofString))
         assertFalse(typeAofAny.isAssignableFrom(typeBofString))

@@ -41,7 +41,7 @@ class TypeDefinition(val name: String, val isInterface: Boolean = false) {
     fun property(name: String, type: TypeExpression) = this.apply { this.properties.add(name to type) }
 
     fun with() = TypeInitiator(this)
-    fun construct() = with().init().also {
+    fun construct() = with().construct().also {
         validateInterfaces()
     }
 
@@ -98,7 +98,7 @@ class TypeInitiator(private val definition: TypeDefinition) {
 
     fun param(param: String, to: TypeExpression) = this.apply { parameterBindings.add(param, to) }
 
-    fun init(): ConstructedType {
+    fun construct(): ConstructedType {
         definition.parameters.all { typeParam ->
             val binding = parameterBindings.bindings[typeParam.name] ?: throw RuntimeException("unbound: $typeParam")
             return@all typeParam.upperBound?.isAssignableFrom(binding) ?: true
@@ -174,9 +174,9 @@ class FunctionType(
     override fun isAssignableFrom(other: TypeExpression): Boolean {
         if (other is FunctionType) {
             if (other.parameters.size != parameters.size) return false
-            if (!returnType.isAssignableFrom(other.returnType)) return false
+            if (returnType != other.returnType) return false
             return parameters.zip(other.parameters).all { (p1, p2) ->
-                p1.second.isAssignableFrom(p2.second)
+                p1.second == p2.second
             }
         }
         return false

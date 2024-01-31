@@ -47,8 +47,15 @@ class FunctionTypeTest {
     }
 
     @Test
-    fun `function with assignable parameters and return types are compatible`() {
+    fun `function with NOT exact but assignable parameters and return types are NOT compatible - AKA invariant`() {
         val fnc1 = FunctionType("fnc1", listOf("param1" to superType, "param2" to subType), t3)
+        val fnc2 = FunctionType("fnc1", listOf("param1" to subType, "param2" to subType), t3)
+        assertFalse(fnc1.isAssignableFrom(fnc2))
+    }
+
+    @Test
+    fun `function with exact parameters and return types are compatible`() {
+        val fnc1 = FunctionType("fnc1", listOf("param1" to subType, "param2" to subType), t3)
         val fnc2 = FunctionType("fnc1", listOf("param1" to subType, "param2" to subType), t3)
         assertTrue(fnc1.isAssignableFrom(fnc2))
     }

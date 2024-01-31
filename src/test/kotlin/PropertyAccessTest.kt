@@ -78,7 +78,7 @@ class PropertyAccessTest {
 
         val a = TypeDefinition("A").parameter("T", b.construct()).property("x", TypeVariable("T"))
 
-        val aOfC = a.with().param("T", c.construct()).init()
+        val aOfC = a.with().param("T", c.construct()).construct()
 
         val x = aOfC.find("x")
 
@@ -106,10 +106,10 @@ class PropertyAccessTest {
     fun `parametric property access in chain`() {
 
         val b = TypeDefinition("B").parameter("T").property("x", TypeVariable("T"))
-        val c = TypeDefinition("C").extends(b.with().param("T", TypeVariable("T")).init())
-        val d = TypeDefinition("D").extends(c.with().param("T", TypeVariable("T")).init())
+        val c = TypeDefinition("C").extends(b.with().param("T", TypeVariable("T")).construct())
+        val d = TypeDefinition("D").extends(c.with().param("T", TypeVariable("T")).construct())
 
-        val property = d.with().param("T", typeStr).init().find("x")
+        val property = d.with().param("T", typeStr).construct().find("x")
 
         assertEquals(property?.depth, 2)
         assertEquals(property?.position, 0)
@@ -127,13 +127,13 @@ class PropertyAccessTest {
      */
     @Test
     fun `parametric property access in chain 2`() {
-        val listOfT = typeList.with().param("T", TypeVariable("T")).init()
+        val listOfT = typeList.with().param("T", TypeVariable("T")).construct()
 
         val b = TypeDefinition("B").parameter("T").property("x", listOfT)
-        val c = TypeDefinition("C").extends(b.with().param("T", TypeVariable("T")).init())
-        val d = TypeDefinition("D").extends(c.with().param("T", TypeVariable("T")).init())
+        val c = TypeDefinition("C").extends(b.with().param("T", TypeVariable("T")).construct())
+        val d = TypeDefinition("D").extends(c.with().param("T", TypeVariable("T")).construct())
 
-        val property = d.with().param("T", typeStr).init().find("x")
+        val property = d.with().param("T", typeStr).construct().find("x")
 
         assertEquals(property?.depth, 2)
         assertEquals(property?.position, 0)
@@ -157,12 +157,12 @@ class PropertyAccessTest {
      */
     @Test
     fun `parametric property access in chain 3`() {
-        val listOfK = typeList.with().param("T", TypeVariable("K")).init()
+        val listOfK = typeList.with().param("T", TypeVariable("K")).construct()
 
         val b = TypeDefinition("B").parameter("T").parameter("K").property("x", listOfK)
-        val c = TypeDefinition("C").extends(b.with().param("T", TypeVariable("T")).param("K", typeInt).init())
+        val c = TypeDefinition("C").extends(b.with().param("T", TypeVariable("T")).param("K", typeInt).construct())
 
-        val property = c.with().param("T", typeStr).init().find("x")
+        val property = c.with().param("T", typeStr).construct().find("x")
 
         assertEquals(property?.depth, 1)
         assertEquals(property?.position, 0)
@@ -186,12 +186,12 @@ class PropertyAccessTest {
      */
     @Test
     fun `parametric property access in chain 4`() {
-        val listOfK = typeList.with().param("T", TypeVariable("K")).init()
+        val listOfK = typeList.with().param("T", TypeVariable("K")).construct()
 
         val b = TypeDefinition("B").parameter("T").parameter("K").property("x", listOfK)
-        val c = TypeDefinition("C").extends(b.with().param("T", TypeVariable("P")).param("K", TypeVariable("G")).init())
+        val c = TypeDefinition("C").extends(b.with().param("T", TypeVariable("P")).param("K", TypeVariable("G")).construct())
 
-        val property = c.with().param("P", typeStr).param("G", typeInt).init().find("x")
+        val property = c.with().param("P", typeStr).param("G", typeInt).construct().find("x")
 
         assertEquals(property?.depth, 1)
         assertEquals(property?.position, 0)
