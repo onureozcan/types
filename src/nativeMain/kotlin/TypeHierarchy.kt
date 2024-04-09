@@ -9,7 +9,9 @@ object TypeHierarchy {
         other: ConstructedType,
         withBindings: ParameterBindings,
     ): Boolean {
-        if (other.isNullable != _this.isNullable) return false
+        if (other.isNullable &&!_this.isNullable) {
+            return false
+        }
         if (_this.typeDefinition == other.typeDefinition) {
             return _this.parameterBindings.isAssignableFrom(withBindings)
         }

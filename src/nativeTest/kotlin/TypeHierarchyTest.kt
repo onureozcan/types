@@ -18,6 +18,25 @@ class TypeHierarchyTest {
 
     /**
     fun test() {
+    class A
+    val a: A
+    val b: A?
+    a = b
+    b = a // Error
+    }
+     */
+    @Test
+    fun `nullable types cannot be assigned to non-nullables`() {
+        val typeDefinition = TypeDefinition("A")
+        val a = typeDefinition.construct()
+        val b = typeDefinition.with().nullable().construct()
+
+        assertFalse(a.isAssignableFrom(b))
+        assertTrue(b.isAssignableFrom(a))
+    }
+
+    /**
+    fun test() {
     open class A
     class B: A()
     val a: A = B()

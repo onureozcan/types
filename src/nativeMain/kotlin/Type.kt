@@ -65,9 +65,7 @@ class TypeDefinition(val name: String, val isInterface: Boolean = false) {
     }
 
     fun with() = TypeInitiator(this)
-    fun construct() = with().construct().also {
-        validateInterfaces()
-    }
+    fun construct() = with().construct()
 
     fun getQualifyingName() = "$packageName.$name"
 
@@ -79,7 +77,7 @@ class TypeDefinition(val name: String, val isInterface: Boolean = false) {
         return thisLevelProperties
     }
 
-    private fun validateInterfaces() {
+    fun validateInterfaces() {
         val requiredPropertiesMap = mutableMapOf<String, TypeExpression>()
         for (_interface in interfaces) {
             val propertiesOfInterface = _interface.getAllProperties()
@@ -129,7 +127,9 @@ class TypeInitiator(private val definition: TypeDefinition) {
             val binding = parameterBindings.bindings[typeParam.name] ?: throw RuntimeException("unbound: $typeParam")
             return@all typeParam.upperBound?.isAssignableFrom(binding) ?: true
         }
-        return ConstructedType(typeDefinition = definition, parameterBindings = parameterBindings, isNullable = isNullable)
+        return ConstructedType(typeDefinition = definition, parameterBindings = parameterBindings, isNullable = isNullable).also {
+            definition.validateInterfaces()
+        }
     }
 }
 
