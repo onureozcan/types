@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.6.20"
+    kotlin("multiplatform") version "1.9.23"
 }
 
 group = "org.types"
@@ -10,6 +10,9 @@ repositories {
 }
 
 kotlin {
+    linuxX64()
+    mingwX64()
+
     val hostOs = System.getProperty("os.name")
     val isMingwX64 = hostOs.startsWith("Windows")
     val nativeTarget = when {
@@ -19,10 +22,6 @@ kotlin {
         else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
     }
 
-    nativeTarget.apply {
-        binaries {
-        }
-    }
     sourceSets {
         val nativeMain by getting
         val nativeTest by getting

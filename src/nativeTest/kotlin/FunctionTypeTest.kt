@@ -87,9 +87,9 @@ class FunctionTypeTest {
     }
 
     @Test
-    fun `function type variables can NOT be overloaded if they have ambiguous parameters 1`() {
-        val fnc1 = FunctionType(listOf("param1" to superType), t3)
-        val fnc2 = FunctionType(listOf("param1" to subType), t3)
+    fun `function type variables can NOT be overloaded if they have the same parameters`() {
+        val fnc1 = FunctionType(listOf("param1" to t1), t3)
+        val fnc2 = FunctionType(listOf("param1" to t1), t3)
         val exception = assertThrows<RuntimeException> {
             TypeDefinition("A")
                 .property("fnc1", fnc1)
@@ -101,33 +101,9 @@ class FunctionTypeTest {
     }
 
     @Test
-    fun `function type variables can NOT be overloaded if they have ambiguous parameters 2`() {
-        val fnc1 = FunctionType(listOf("param1" to subType), t3)
-        val fnc2 = FunctionType(listOf("param1" to superType), t3)
-        val exception = assertThrows<RuntimeException> {
-            TypeDefinition("A")
-                .property("fnc1", fnc1)
-                .property("fnc1", fnc2)
-                .construct()
-        }
-
-        assertEquals("property fnc1 is already defined", exception.message)
-    }
-
-    @Test
-    fun `function type variables can be overloaded even if they have partial ambiguous parameters`() {
-        val fnc1 = FunctionType(listOf("param1" to subType, "param2" to t1), t3)
-        val fnc2 = FunctionType(listOf("param1" to superType, "param2" to t2), t3)
-        TypeDefinition("A")
-            .property("fnc1", fnc1)
-            .property("fnc1", fnc2)
-            .construct()
-    }
-
-    @Test
-    fun `function type variables can be overloaded even if given parameter sizes are different`() {
-        val fnc1 = FunctionType(listOf("param1" to subType, "param2" to t1), t3)
-        val fnc2 = FunctionType(listOf("param1" to superType), t3)
+    fun `function type variables can be overloaded if given parameter sizes are different`() {
+        val fnc1 = FunctionType(listOf("param1" to t1, "param2" to t2), t3)
+        val fnc2 = FunctionType(listOf("param1" to t1), t3)
         TypeDefinition("A")
             .property("fnc1", fnc1)
             .property("fnc1", fnc2)

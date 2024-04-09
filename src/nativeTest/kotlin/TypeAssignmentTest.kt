@@ -2,7 +2,7 @@ import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class TypeHierarchyTest {
+class TypeAssignmentTest {
 
     private val typeAny = TypeDefinition("Any").construct()
     private val typeString = TypeDefinition("String").extends(typeAny)
@@ -30,6 +30,29 @@ class TypeHierarchyTest {
         val typeDefinition = TypeDefinition("A")
         val a = typeDefinition.construct()
         val b = typeDefinition.with().nullable().construct()
+
+        assertFalse(a.isAssignableFrom(b))
+        assertTrue(b.isAssignableFrom(a))
+    }
+
+    /**
+    fun test() {
+    class A<T>
+    val a: T
+    val b: T?
+    a = b
+    b = a // Error
+    }
+     */
+    @Test
+    fun `nullable type variables cannot be assigned to non-nullables`() {
+        val typeDefinition = TypeDefinition("A")
+            .parameter("T")
+            .property("a", TypeVariable("T"))
+            .property("b", TypeVariable("T", isNullable = true))
+
+        val a = typeDefinition.find("a")!!
+        val b = typeDefinition.find("b")!!
 
         assertFalse(a.isAssignableFrom(b))
         assertTrue(b.isAssignableFrom(a))
