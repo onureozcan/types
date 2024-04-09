@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.6.20"
+    kotlin("multiplatform") version "1.9.23"
 }
 
 group = "org.types"
@@ -11,10 +11,20 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    testImplementation(kotlin("test"))
-}
+kotlin {
+    jvm()
+    mingwX64()
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
+    applyDefaultHierarchyTemplate()
+
+    sourceSets {
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+        }
+
+        jvmMain.get().dependsOn(commonMain.get())
+        mingwMain.get().dependsOn(commonMain.get())
+
+        jvmTest.get().dependsOn(commonTest.get())
+    }
 }
