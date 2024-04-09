@@ -38,7 +38,31 @@ class TypeDefinition(val name: String, val isInterface: Boolean = false) {
 
     fun find(name: String) = properties.find { it.first == name }?.second
 
-    fun property(name: String, type: TypeExpression) = this.apply { this.properties.add(name to type) }
+    fun property(name: String, type: TypeExpression) = this.apply {
+        val existingProperties = this.properties.filter { (_name, _) -> name == _name }.map { it.second }
+        if (existingProperties.isNotEmpty() && !checkOverloadPossible(existingProperties, type)) {
+            throw RuntimeException("property $name is already defined")
+        }
+        this.properties.add(name to type)
+    }
+
+    private fun checkOverloadPossible(existingTypes: List<TypeExpression>, newType: TypeExpression): Boolean {
+        if (!(newType is FunctionType))  return false
+        existingTypes.filterIsInstance<FunctionType>().forEach { type ->
+            if (type.returnType != newType.returnType) {
+                return false
+            }
+            if (type.parameters.size == newType.parameters.size) {
+                val allParamsAreAmbiguous = type.parameters.zip(newType.parameters).all { (t1, t2) ->
+                    t1.second.isAssignableFrom(t2.second) || t2.second.isAssignableFrom(t1.second)
+                }
+                if (allParamsAreAmbiguous) {
+                    return false
+                }
+            }
+        }
+        return true
+    }
 
     fun with() = TypeInitiator(this)
     fun construct() = with().construct().also {
@@ -62,7 +86,7 @@ class TypeDefinition(val name: String, val isInterface: Boolean = false) {
             for ((name, type) in propertiesOfInterface) {
                 if (requiredPropertiesMap.containsKey(name)) {
                     val prevType = requiredPropertiesMap[name]
-                    if (prevType != type){
+                    if (prevType != type) {
                         throw RuntimeException("type clash: types $type and $prevType are not compatible for property $name")
                     }
                 }
@@ -163,8 +187,7 @@ class TypeVariable(
 }
 
 class FunctionType(
-    val name: String,
-    private val parameters: List<Pair<String, TypeExpression>>,
+    val parameters: List<Pair<String, TypeExpression>>,
     val returnType: TypeExpression
 ) : TypeExpression {
     override fun find(name: String): PropertyLookupResult? {
