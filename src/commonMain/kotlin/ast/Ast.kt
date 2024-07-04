@@ -27,7 +27,7 @@ class ValueExpression(
 
     companion object {
         enum class ValueType {
-            VALUE_TYPE_STRING, VALUE_TYPE_DECIMAL, VALUE_TYPE_INTEGRAL, VALUE_TYPE_BOOL
+            VALUE_TYPE_STRING, VALUE_TYPE_DECIMAL, VALUE_TYPE_INTEGER, VALUE_TYPE_BOOL
         }
     }
 
@@ -35,7 +35,7 @@ class ValueExpression(
         return when(valueType) {
             ValueType.VALUE_TYPE_BOOL -> PredefinedTypes.typeBool
             ValueType.VALUE_TYPE_STRING -> PredefinedTypes.typeString
-            ValueType.VALUE_TYPE_INTEGRAL ->  PredefinedTypes.typeInt
+            ValueType.VALUE_TYPE_INTEGER ->  PredefinedTypes.typeInt
             ValueType.VALUE_TYPE_DECIMAL -> PredefinedTypes.typeDouble
         }
     }

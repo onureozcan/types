@@ -1,6 +1,10 @@
 package ast
 
 import PredefinedTypes
+import PredefinedTypes.Companion.typeDouble
+import PredefinedTypes.Companion.typeInt
+import PredefinedTypes.Companion.typeNumber
+import PredefinedTypes.Companion.typeString
 import TypeExpression
 
 
@@ -23,13 +27,17 @@ object AdditionOperator: BinaryOperator {
         val leftType = left.resolveType()
         val rightType = right.resolveType()
 
-        if (!PredefinedTypes.typeNumber.isAssignableFrom(leftType) || !PredefinedTypes.typeNumber.isAssignableFrom(rightType)) {
-            throw RuntimeException("Addition operation is defined only between numbers")
+        if (typeString.isAssignableFrom(leftType) && typeString.isAssignableFrom(rightType)) {
+            return typeString
         }
 
-        if (PredefinedTypes.typeDouble.isAssignableFrom(leftType) || PredefinedTypes.typeDouble.isAssignableFrom(rightType)) {
-            return PredefinedTypes.typeDouble
+        if (!typeNumber.isAssignableFrom(leftType) || !typeNumber.isAssignableFrom(rightType)) {
+            throw RuntimeException("Addition operation is defined only between 2 numbers or 2 strings")
         }
-        return PredefinedTypes.typeInt
+
+        if (typeDouble.isAssignableFrom(leftType) || typeDouble.isAssignableFrom(rightType)) {
+            return typeDouble
+        }
+        return typeInt
     }
 }
