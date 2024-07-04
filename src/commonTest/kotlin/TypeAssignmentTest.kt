@@ -1,13 +1,12 @@
+import PredefinedTypes.Companion.typeAny
+import PredefinedTypes.Companion.typeInt
+import PredefinedTypes.Companion.typeNumber
+import PredefinedTypes.Companion.typeString
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class TypeAssignmentTest {
-
-    private val typeAny = TypeDefinition("Any").construct()
-    private val typeString = TypeDefinition("String").extends(typeAny)
-    private val typeNumber = TypeDefinition("Number").extends(typeAny)
-    private val typeInt = TypeDefinition("Int").extends(typeNumber.construct())
 
     @Test
     fun `simple same types are assignable`() {
@@ -88,7 +87,7 @@ class TypeAssignmentTest {
         val typeA = TypeDefinition("A").construct()
         val typeB = TypeDefinition("B").extends(typeA).parameter("T")
 
-        val typeBofString = typeB.with().param("T", typeString.construct()).construct()
+        val typeBofString = typeB.with().param("T", typeString).construct()
 
         assertTrue(typeA.isAssignableFrom(typeBofString))
         assertFalse(typeBofString.isAssignableFrom(typeA))
@@ -106,10 +105,10 @@ class TypeAssignmentTest {
     @Test
     fun `subtype of generic supertype can be assigned to generic supertype`() {
         val typeA = TypeDefinition("A").parameter("T")
-        val typeB = TypeDefinition("B").extends(typeA.with().param("T", typeString.construct()).construct()).construct()
-        val typeC = TypeDefinition("C").extends(typeA.with().param("T", typeInt.construct()).construct()).construct()
+        val typeB = TypeDefinition("B").extends(typeA.with().param("T", typeString).construct()).construct()
+        val typeC = TypeDefinition("C").extends(typeA.with().param("T", typeInt).construct()).construct()
 
-        val typeAofString = typeA.with().param("T", typeString.construct()).construct()
+        val typeAofString = typeA.with().param("T", typeString).construct()
 
         assertTrue(typeAofString.isAssignableFrom(typeB))
         assertFalse(typeAofString.isAssignableFrom(typeC))
@@ -128,9 +127,9 @@ class TypeAssignmentTest {
     fun `construction of a generic type is invariant`() {
         val typeA = TypeDefinition("A").parameter("T")
 
-        val typeAofString = typeA.with().param("T", typeString.construct()).construct()
+        val typeAofString = typeA.with().param("T", typeString).construct()
         val typeAofAny = typeA.with().param("T", typeAny).construct()
-        val typeAofInt = typeA.with().param("T", typeInt.construct()).construct()
+        val typeAofInt = typeA.with().param("T", typeInt).construct()
 
         assertTrue(typeAofString.isAssignableFrom(typeAofString))
         assertFalse(typeAofAny.isAssignableFrom(typeAofString))
@@ -153,9 +152,9 @@ class TypeAssignmentTest {
         val typeA = TypeDefinition("A").parameter("T")
         val typeB = TypeDefinition("B").parameter("T").extends(typeA.with().param("T", TypeVariable("T")).construct())
 
-        val typeAofString = typeA.with().param("T", typeString.construct()).construct()
-        val typeBofString = typeB.with().param("T", typeString.construct()).construct()
-        val typeAofInt = typeA.with().param("T", typeInt.construct()).construct()
+        val typeAofString = typeA.with().param("T", typeString).construct()
+        val typeBofString = typeB.with().param("T", typeString).construct()
+        val typeAofInt = typeA.with().param("T", typeInt).construct()
         val typeAofAny = typeA.with().param("T", typeAny).construct()
 
         assertTrue(typeAofString.isAssignableFrom(typeBofString))
@@ -177,12 +176,12 @@ class TypeAssignmentTest {
      */
     @Test
     fun `Type variables are invariant`() {
-        val typeA = TypeDefinition("A").parameter("T", typeNumber.construct()).property("a", TypeVariable("T"))
+        val typeA = TypeDefinition("A").parameter("T", typeNumber).property("a", TypeVariable("T"))
             .property("b", TypeVariable("T"))
         val a = typeA.find("a")!!
         val b = typeA.find("b")!!
         assertTrue(a.isAssignableFrom(b))
-        assertFalse(a.isAssignableFrom(typeInt.construct()))
+        assertFalse(a.isAssignableFrom(typeInt))
     }
 
     @Test

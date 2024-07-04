@@ -29,7 +29,7 @@ class TypeDefinition(val name: String, val isInterface: Boolean = false) {
     fun parameter(name: String, upperBound: TypeExpression? = null) =
         this.apply { this.parameters.add(TypeVariable(name, upperBound)) }
 
-    fun find(name: String) = properties.find { it.first == name }?.second
+    fun find(name: String): TypeExpression? = properties.find { it.first == name }?.second
 
     fun property(name: String, type: TypeExpression) = this.apply {
         val existingProperties = this.properties.filter { (_name, _) -> name == _name }.map { it.second }
