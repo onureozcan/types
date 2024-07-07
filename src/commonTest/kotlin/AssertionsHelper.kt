@@ -10,4 +10,14 @@ object AssertionsHelper {
         }
         throw RuntimeException("Expected exception wasn't thrown")
     }
+
+    inline fun <reified T: Exception> assertDoesNotThrow(executable: ()-> Unit) {
+        try {
+            executable()
+        } catch (ex: Exception) {
+            if (ex is T) {
+                throw RuntimeException("Unexpected exception was thrown", ex)
+            }
+        }
+    }
 }

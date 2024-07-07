@@ -1,7 +1,7 @@
+package ast
+
 import AssertionsHelper.assertThrows
-import ast.AdditionOperator
-import ast.BinaryExpression
-import ast.ValueExpression
+import PredefinedTypes
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -47,5 +47,15 @@ class ExpressionEvaluationTest {
 
         val thrown = assertThrows<RuntimeException> { binary.resolveType() }
         assertEquals("Addition operation is defined only between 2 numbers or 2 strings", thrown.message)
+    }
+
+    @Test
+    fun `simple addition between 3 integers yield to int`() {
+        val left = ValueExpression("3", ValueExpression.Companion.ValueType.VALUE_TYPE_INTEGER)
+        val right = ValueExpression("5", ValueExpression.Companion.ValueType.VALUE_TYPE_INTEGER)
+
+        val binary = BinaryExpression(left, AdditionOperator, BinaryExpression(left, AdditionOperator, right))
+
+        assertEquals(PredefinedTypes.typeInt, binary.resolveType())
     }
 }
